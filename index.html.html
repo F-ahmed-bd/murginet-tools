@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B4A3D">
+<meta name="description" content="মুরগি ডট নেট দৈনিক প্রোডাকশন রিপোর্ট">
+<title>দৈনিক প্রোডাকশন রিপোর্ট — Murgi.net</title>
+<style>
+  :root{
+    --paper:#F3F5EF;
+    --surface:#FFFFFF;
+    --surface-raised:#FFFFFF;
+    --ledger-line:#DCE4D6;
+    --ledger-line-strong:#C3D0BB;
+    --ink:#1F2E2B;
+    --ink-soft:#57675F;
+    --ink-faint:#8B968E;
+    --accent:#2F6F5E;
+    --accent-deep:#1B4A3D;
+    --accent-soft:#E6EFEA;
+    --border:#DDE3D8;
+    --good:#1E7A4C;
+    --good-bg:#E4F3EA;
+    --bad:#B3261E;
+    --bad-bg:#FBEAE8;
+    --shadow:0 1px 2px rgba(31,46,43,0.06), 0 6px 16px rgba(31,46,43,0.06);
+    --radius:12px;
+    --radius-lg:18px;
+    --font-sans: "Noto Sans Bengali", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Roboto Mono", "Courier New", monospace;
+    color-scheme: light;
+  }
+
+  html[data-theme="dark"]{
+    --paper:#11170F;
+    --surface:#182019;
+    --surface-raised:#1D2620;
+    --ledger-line:#2A362F;
+    --ledger-line-strong:#37453C;
+    --ink:#EAF1EC;
+    --ink-soft:#A3B3AB;
+    --ink-faint:#6F8078;
+    --accent:#4FAF93;
+    --accent-deep:#7BCBB2;
+    --accent-soft:#20332B;
+    --border:#2A362F;
+    --good:#4CC98A;
+    --good-bg:#173226;
+    --bad:#F0776D;
+    --bad-bg:#3A1E1B;
+    --shadow:0 1px 2px rgba(0,0,0,0.25), 0 6px 20px rgba(0,0,0,0.35);
+    color-scheme: dark;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-sans);
+    -webkit-tap-highlight-color:transparent;
+    overscroll-behavior-y:none;
+  }
+
+  button, input, textarea{ font-family:inherit; }
+
+  .app-screen{ display:none; min-height:100dvh; min-height:100vh; flex-direction:column; }
+  .app-screen.active{ display:flex; }
+
+  /* ---------- Shared bits ---------- */
+  .icon-btn{
+    background:none; border:none; color:var(--ink-soft);
+    font-size:1.3rem; line-height:1; cursor:pointer; padding:0.5rem;
+    min-width:44px; min-height:44px;
+    display:inline-flex; align-items:center; justify-content:center;
+    border-radius:50%;
+  }
+  .icon-btn:hover{ background:var(--accent-soft); }
+
+  .btn{
+    font-family:var(--font-sans); font-weight:700; font-size:1rem;
+    border-radius:var(--radius); padding:0.8rem 1.2rem; min-height:50px;
+    cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
+    border:1.5px solid transparent;
+    transition:background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  }
+  .btn-primary{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .btn-primary:hover{ background:var(--accent-deep); border-color:var(--accent-deep); }
+  .btn-outline{ background:var(--surface); color:var(--accent-deep); border-color:var(--accent); }
+  .btn-outline:hover{ background:var(--accent-soft); }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); border-color:var(--border); }
+  .btn-ghost:hover{ background:var(--accent-soft); }
+  .btn-danger-ghost{ background:transparent; color:var(--bad); border-color:var(--bad); }
+  .btn-danger-ghost:hover{ background:var(--bad-bg); }
+  .btn-danger{ background:var(--bad); color:#fff; border-color:var(--bad); }
+  .btn-danger:hover{ background:#8f1e18; }
+  .btn-block{ width:100%; }
+  .btn-small{ min-height:38px; padding:0.45rem 0.8rem; font-size:0.85rem; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  input[type="text"], input[type="time"], textarea{
+    width:100%; border:1.5px solid var(--border); border-radius:10px;
+    padding:0.75rem 0.85rem; font-size:1rem; color:var(--ink); background:var(--surface);
+    min-height:48px;
+  }
+  textarea{ min-height:90px; resize:vertical; line-height:1.5; }
+  input:focus, textarea:focus{
+    outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(47,111,94,0.18);
+  }
+  input::placeholder, textarea::placeholder{ color:var(--ink-faint); }
+
+  .numeric-input{
+    font-family:var(--font-mono); font-variant-numeric:tabular-nums;
+    text-align:right; font-size:1.15rem; font-weight:600;
+  }
+
+  [hidden]{ display:none !important; }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* ---------- Home ---------- */
+  .home-wrap{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:2rem 1.25rem; text-align:center; gap:0.35rem;
+  }
+  .home-icon{ color:var(--accent-deep); margin-bottom:0.5rem; }
+  .home-title{ font-size:1.4rem; font-weight:700; color:var(--accent-deep); margin:0; }
+  .home-subtitle{ font-size:0.92rem; color:var(--ink-soft); margin:0.15rem 0 1.4rem; }
+  .home-date{
+    font-size:0.95rem; color:var(--ink-soft); background:var(--surface);
+    border:1px solid var(--border); padding:0.5rem 1rem; border-radius:999px; margin-bottom:1.75rem;
+  }
+  .home-actions{ width:100%; max-width:360px; display:flex; flex-direction:column; gap:0.7rem; }
+  .home-secondary-links{ display:flex; gap:1.5rem; margin-top:1.75rem; }
+  .home-secondary-links button{
+    background:none; border:none; color:var(--accent-deep); font-weight:700; font-size:0.92rem;
+    cursor:pointer; padding:0.5rem;
+  }
+  .home-draft-note{ font-size:0.82rem; color:var(--ink-faint); margin-top:-0.3rem; }
+  .home-discard-link{
+    background:none; border:none; color:var(--ink-faint); font-size:0.85rem;
+    text-decoration:underline; cursor:pointer; padding:0.4rem;
+  }
+
+  .app-footer-mini{ text-align:center; padding:1rem 1rem 1.4rem; font-size:0.72rem; color:var(--ink-faint); }
+  .app-footer-mini .dot{ margin:0 0.35rem; }
+
+  /* ---------- Top bar ---------- */
+  .top-bar{
+    display:flex; align-items:center; gap:0.6rem; padding:0.7rem 0.6rem;
+    border-bottom:1px solid var(--border); background:var(--surface);
+    position:sticky; top:0; z-index:5;
+  }
+  .top-bar-title{ font-size:1.05rem; font-weight:700; color:var(--accent-deep); }
+  .screen-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .screen-pad{ padding:1rem 1.1rem 2rem; }
+
+  .bottom-bar{
+    display:flex; gap:0.7rem; padding:0.8rem 1.1rem calc(0.8rem + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border); background:var(--surface);
+  }
+  .bottom-bar .btn-flex{ flex:1; }
+
+  /* ---------- Section cards / eyebrows ---------- */
+  .section-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+    box-shadow:var(--shadow); padding:1.1rem 1.1rem 1.25rem; margin-bottom:1rem;
+  }
+  .section-eyebrow-simple{
+    font-size:0.78rem; text-transform:uppercase; letter-spacing:0.10em; font-weight:700;
+    color:var(--accent-deep); margin:0 0 0.9rem;
+  }
+
+  /* ---------- Receive entries ---------- */
+  .receive-entry-card{
+    background:var(--paper); border:1px solid var(--border); border-radius:var(--radius);
+    padding:0.7rem 0.8rem; margin-bottom:0.6rem;
+  }
+  .receive-entry-top{ display:flex; align-items:center; justify-content:space-between; gap:0.5rem; margin-bottom:0.55rem; }
+  .receive-entry-top input[type="time"]{ max-width:150px; min-height:42px; padding:0.4rem 0.5rem; font-size:0.92rem; }
+  .receive-entry-grid{ display:grid; grid-template-columns:1fr 0.8fr 1fr; gap:0.5rem; }
+  .receive-entry-field label{ display:block; font-size:0.72rem; color:var(--ink-faint); margin-bottom:0.25rem; font-weight:600; }
+  .receive-entry-field input{ min-height:42px; padding:0.45rem 0.5rem; font-size:0.92rem; }
+  .receive-entry-field input.numeric-input{ font-size:0.95rem; }
+  .receive-delete-btn{
+    background:none; border:none; color:var(--ink-faint); font-size:1.2rem; cursor:pointer;
+    padding:0.25rem; min-width:36px; min-height:36px;
+  }
+  .receive-delete-btn:hover{ color:var(--bad); }
+  .receive-totals-row{
+    display:flex; flex-wrap:wrap; gap:1.2rem; justify-content:space-between;
+    border-top:1.5px solid var(--ledger-line-strong); margin-top:0.6rem; padding-top:0.7rem;
+    font-size:0.85rem; color:var(--ink-soft);
+  }
+  .receive-totals-row b{ font-family:var(--font-mono); color:var(--accent-deep); font-size:0.98rem; }
+  .receive-empty-note{ font-size:0.85rem; color:var(--ink-faint); font-style:italic; padding:0.3rem 0 0.7rem; }
+  .add-row-btn{ margin-top:0.2rem; }
+
+  /* ---------- Product entry cards ---------- */
+  .product-entry-card{
+    background:var(--paper); border:1px solid var(--border); border-radius:var(--radius);
+    padding:0.75rem 0.85rem; margin-bottom:0.65rem;
+  }
+  .product-entry-header{ display:flex; justify-content:space-between; align-items:center; gap:0.5rem; margin-bottom:0.6rem; }
+  .product-entry-name{ font-weight:700; font-size:0.95rem; color:var(--ink); }
+  .product-entry-name .byproduct-tag{
+    display:inline-block; font-size:0.62rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.05em; color:var(--accent); background:var(--accent-soft);
+    border-radius:5px; padding:0.05rem 0.35rem; margin-left:0.4rem; vertical-align:middle;
+  }
+  .prev-stock-pill{
+    background:var(--accent-soft); border:none; color:var(--accent-deep);
+    font-family:var(--font-mono); font-weight:700; font-size:0.78rem;
+    padding:0.35rem 0.6rem; border-radius:999px; cursor:pointer; white-space:nowrap;
+  }
+  .prev-stock-edit-row{ display:flex; align-items:center; gap:0.4rem; }
+  .prev-stock-edit-row input{ max-width:100px; min-height:38px; padding:0.35rem 0.5rem; font-size:0.85rem; }
+  .prev-stock-edit-row button{
+    background:none; border:none; color:var(--accent); font-weight:700; font-size:0.8rem;
+    cursor:pointer; padding:0.3rem;
+  }
+  .product-entry-fields{ display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:0.6rem; }
+  .product-entry-field label{ display:block; font-size:0.76rem; color:var(--ink-soft); margin-bottom:0.3rem; font-weight:600; }
+  .product-entry-final{
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    padding:0.5rem 0.7rem;
+  }
+  .product-entry-final span:first-child{ font-size:0.8rem; color:var(--ink-soft); font-weight:600; }
+  .final-stock-value{
+    font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-weight:700;
+    font-size:1.05rem; color:var(--accent-deep);
+  }
+  .final-stock-value.negative{ color:var(--bad); }
+
+  /* ---------- Review ---------- */
+  .review-summary-row{
+    display:flex; justify-content:space-between; align-items:center; gap:0.6rem;
+    padding:0.55rem 0; border-bottom:1px dashed var(--ledger-line); font-size:0.88rem;
+  }
+  .review-summary-row:last-child{ border-bottom:none; }
+  .review-summary-figures{
+    display:flex; gap:0.9rem; font-family:var(--font-mono); font-variant-numeric:tabular-nums;
+    font-size:0.82rem; color:var(--ink-soft); flex-wrap:wrap;
+  }
+  .review-summary-figures b{ color:var(--ink); font-weight:700; }
+
+  .review-totals{ display:grid; grid-template-columns:1fr 1fr; gap:0.7rem; margin-bottom:0.3rem; }
+  .review-total-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:0.8rem 0.9rem;
+  }
+  .review-total-label{ font-size:0.76rem; color:var(--ink-faint); margin:0 0 0.25rem; }
+  .review-total-value{
+    font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-weight:700;
+    font-size:1.1rem; color:var(--ink);
+  }
+  .review-total-value.negative{ color:var(--bad); }
+  .review-total-card.warn-light{ background:#FFF6E0; border-color:#E8C766; }
+  .review-total-card.warn-light .review-total-value{ color:#8A6D1A; }
+  .review-total-card.warn-strong{ background:var(--bad-bg); border-color:var(--bad); }
+  .review-total-card.warn-strong .review-total-value{ color:var(--bad); }
+
+  .field-group{ margin-bottom:1.15rem; }
+  .field-label{ display:block; font-size:0.88rem; color:var(--ink-soft); margin-bottom:0.4rem; font-weight:600; }
+
+  /* ---------- Generated screen ---------- */
+  .generated-wrap{
+    flex:1; display:flex; flex-direction:column; align-items:center; padding:1.5rem 1.1rem 2rem; overflow-y:auto;
+  }
+  .generated-heading{ font-size:1.15rem; font-weight:700; color:var(--good); margin:0 0 1.1rem; text-align:center; }
+  .report-preview-frame{
+    width:100%; max-width:420px; border:1px solid var(--border); border-radius:var(--radius-lg);
+    overflow:hidden; box-shadow:var(--shadow); margin-bottom:1.3rem; background:var(--surface);
+  }
+  .report-preview-frame img{ width:100%; display:block; }
+  .generated-actions{ width:100%; max-width:420px; display:flex; flex-direction:column; gap:0.65rem; }
+
+  /* ---------- History ---------- */
+  .history-list{ display:flex; flex-direction:column; gap:0.65rem; margin-bottom:1rem; }
+  .history-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:0.8rem 0.9rem; }
+  .history-card-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; }
+  .history-card-date{ font-weight:700; font-size:0.92rem; }
+  .history-card-figures{ display:flex; gap:1.2rem; font-size:0.8rem; color:var(--ink-soft); margin-bottom:0.6rem; flex-wrap:wrap; }
+  .history-card-figures b{ font-family:var(--font-mono); color:var(--ink); }
+  .history-card-actions{ display:flex; gap:0.5rem; }
+  .history-empty{ text-align:center; color:var(--ink-faint); padding:2.5rem 1rem; font-size:0.9rem; }
+
+  /* ---------- Settings ---------- */
+  .settings-section{ margin-bottom:1.8rem; }
+  .settings-section-title{
+    font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;
+    color:var(--accent-deep); margin:0 0 0.75rem;
+  }
+  .theme-toggle-group{ display:flex; gap:0.5rem; }
+  .theme-toggle-btn{
+    flex:1; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius);
+    padding:0.7rem 0.5rem; font-weight:700; font-size:0.85rem; color:var(--ink-soft); cursor:pointer;
+  }
+  .theme-toggle-btn.active{ border-color:var(--accent); color:var(--accent-deep); background:var(--accent-soft); }
+
+  .product-row{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:0.6rem 0.7rem; margin-bottom:0.55rem;
+  }
+  .product-row-top{ display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; }
+  .product-row input{ min-height:44px; padding:0.5rem 0.6rem; font-size:0.92rem; }
+  .product-row .product-name-input{ flex:1; }
+  .product-row-bottom{ display:flex; align-items:center; gap:0.7rem; flex-wrap:wrap; }
+  .product-row .product-unit-input{ max-width:110px; }
+  .product-reorder{ display:flex; flex-direction:column; }
+  .product-reorder button{
+    background:none; border:none; color:var(--ink-faint); cursor:pointer;
+    font-size:0.75rem; padding:0.1rem 0.3rem; min-height:auto;
+  }
+  .product-delete-btn{ background:none; border:none; color:var(--ink-faint); font-size:1.2rem; cursor:pointer; padding:0.3rem; min-width:36px; }
+  .product-delete-btn:hover{ color:var(--bad); }
+  .by-product-check-label{
+    display:flex; align-items:center; gap:0.4rem; font-size:0.84rem; color:var(--ink-soft);
+    cursor:pointer; user-select:none;
+  }
+  .by-product-check-label input{ width:auto; min-height:auto; accent-color:var(--accent); }
+  .add-product-btn{ margin-top:0.3rem; }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(17,23,15,0.5);
+    display:flex; align-items:center; justify-content:center; padding:1.25rem; z-index:50;
+  }
+  .modal-box{
+    background:var(--surface); border-radius:var(--radius-lg); padding:1.4rem 1.3rem;
+    max-width:360px; width:100%; box-shadow:0 12px 32px rgba(0,0,0,0.3);
+  }
+  .modal-title{ font-weight:700; font-size:1.05rem; margin:0 0 0.5rem; }
+  .modal-message{ font-size:0.9rem; color:var(--ink-soft); margin:0 0 1.25rem; line-height:1.45; }
+  .modal-actions{ display:flex; gap:0.6rem; justify-content:flex-end; }
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed; left:50%; bottom:1.25rem; transform:translateX(-50%);
+    background:var(--accent-deep); color:#fff; padding:0.7rem 1.1rem; border-radius:999px;
+    font-size:0.85rem; font-weight:700; box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    z-index:60; max-width:90vw; text-align:center;
+  }
+
+  @media (min-width:640px){
+    .screen-pad, .bottom-bar{ max-width:560px; margin-left:auto; margin-right:auto; width:100%; }
+    .home-wrap{ max-width:560px; margin:0 auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HOME ============ -->
+<div class="app-screen active" id="screen-home">
+  <div class="home-wrap">
+    <svg class="home-icon" width="52" height="52" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="2" y="8" width="28" height="16" rx="3" stroke="currentColor" stroke-width="2"/>
+      <circle cx="16" cy="16" r="4" stroke="currentColor" stroke-width="2"/>
+      <line x1="6.5" y1="12" x2="6.5" y2="12" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+      <line x1="25.5" y1="20" x2="25.5" y2="20" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    </svg>
+    <h1 class="home-title">দৈনিক প্রোডাকশন রিপোর্ট</h1>
+    <p class="home-subtitle">Murgi.net — কারখানার দৈনিক উৎপাদন হিসাব</p>
+    <div class="home-date" id="homeDateDisplay">--</div>
+
+    <div class="home-actions" id="homeActions"></div>
+
+    <div class="home-secondary-links">
+      <button type="button" id="homeHistoryLink">সাম্প্রতিক রিপোর্ট</button>
+      <button type="button" id="homeSettingsLink">সেটিংস</button>
+    </div>
+  </div>
+  <div class="app-footer-mini">
+    <span>Murgi.net</span><span class="dot">&middot;</span><span>ডেভেলপার: Faisal Ahmed</span><span class="dot">&middot;</span><span>সংস্করণ 1.1</span><span class="dot">&middot;</span><span>সর্বশেষ আপডেট: 17 Jul 2026</span>
+  </div>
+</div>
+
+<!-- ============ DATA ENTRY (single screen) ============ -->
+<div class="app-screen" id="screen-data-entry">
+  <div class="top-bar">
+    <button type="button" class="icon-btn" id="dataEntryHomeBtn" aria-label="হোমে যান">&#8962;</button>
+    <span class="top-bar-title">আজকের রিপোর্ট</span>
+  </div>
+  <div class="screen-scroll"><div class="screen-pad">
+
+    <p id="dataEntryPreparerDisplay" style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 0.3rem;"></p>
+    <p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 1rem;">
+      তারিখ: <b id="dataEntryDateDisplay" style="color:var(--ink);font-family:var(--font-mono);"></b>
+      <button type="button" id="editDateBtn" style="background:none;border:none;color:var(--accent);font-weight:700;font-size:0.82rem;text-decoration:underline;cursor:pointer;padding:0.2rem 0.4rem;">সম্পাদনা</button>
+    </p>
+
+    <section class="section-card">
+      <p class="section-eyebrow-simple">লাইভ মুরগি রিসিভ</p>
+      <div id="receiveEntriesList"></div>
+      <button type="button" id="addReceiveEntryBtn" class="btn btn-outline btn-small add-row-btn">+ রিসিভ এন্ট্রি যোগ করুন</button>
+      <div class="receive-totals-row">
+        <span>মোট পিস: <b id="totalPiecesDisplay">0</b></span>
+        <span>মোট ওজন: <b id="totalLiveWeightDisplay">0.00 Kg</b></span>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <p class="section-eyebrow-simple">প্রোডাক্ট এন্ট্রি</p>
+      <div id="productEntryList"></div>
+    </section>
+
+  </div></div>
+  <div class="bottom-bar">
+    <button type="button" class="btn btn-primary btn-block btn-flex" id="goToReviewBtn">হিসাব করুন</button>
+  </div>
+</div>
+
+<!-- ============ REVIEW ============ -->
+<div class="app-screen" id="screen-review">
+  <div class="top-bar">
+    <button type="button" class="icon-btn" id="reviewBackBtn" aria-label="ডেটা এডিট করুন">&#8592;</button>
+    <span class="top-bar-title">পর্যালোচনা</span>
+  </div>
+  <div class="screen-scroll"><div class="screen-pad">
+
+    <p class="review-summary-row" style="border-bottom:none;">
+      <span>প্রস্তুতকারী</span>
+      <span class="review-summary-figures"><b id="reviewPreparerDisplay">--</b></span>
+    </p>
+
+    <section class="section-card">
+      <p class="section-eyebrow-simple">রিসিভ সামারি</p>
+      <div id="reviewReceiveList"></div>
+    </section>
+
+    <section class="section-card">
+      <p class="section-eyebrow-simple">প্রোডাক্ট সামারি</p>
+      <div id="reviewProductList"></div>
+    </section>
+
+    <section class="section-card" id="yieldSummaryCard">
+      <p class="section-eyebrow-simple">প্রোডাকশন সামারি</p>
+      <div class="review-totals" id="yieldSummaryGrid"></div>
+    </section>
+
+    <div class="field-group">
+      <label class="field-label" for="reviewNoteInput">মন্তব্য (ঐচ্ছিক)</label>
+      <textarea id="reviewNoteInput" placeholder="কোনো বিশেষ মন্তব্য থাকলে লিখুন..." aria-label="মন্তব্য"></textarea>
+    </div>
+
+  </div></div>
+  <div class="bottom-bar">
+    <button type="button" class="btn btn-ghost" id="reviewEditBtn">&#8592; ডেটা এডিট করুন</button>
+    <button type="button" class="btn btn-primary btn-flex" id="reviewGenerateBtn">রিপোর্ট তৈরি করুন</button>
+  </div>
+</div>
+
+<!-- ============ GENERATED ============ -->
+<div class="app-screen" id="screen-generated">
+  <div class="generated-wrap">
+    <p class="generated-heading">রিপোর্ট প্রস্তুত হয়েছে &#10003;</p>
+    <div class="report-preview-frame"><img id="generatedImg" alt="দৈনিক প্রোডাকশন রিপোর্ট"></div>
+    <div class="generated-actions">
+      <button type="button" class="btn btn-ghost btn-block" id="backFromGeneratedBtn">&#8592; Back</button>
+      <button type="button" class="btn btn-primary btn-block" id="shareReportBtn">শেয়ার করুন</button>
+      <button type="button" class="btn btn-outline btn-block" id="downloadReportBtn">ডাউনলোড করুন</button>
+      <button type="button" class="btn btn-ghost btn-block" id="startNewFromGeneratedBtn">নতুন রিপোর্ট শুরু করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HISTORY LIST ============ -->
+<div class="app-screen" id="screen-history">
+  <div class="top-bar">
+    <button type="button" class="icon-btn" id="historyBackBtn" aria-label="পেছনে যান">&#8592;</button>
+    <span class="top-bar-title">সাম্প্রতিক রিপোর্ট</span>
+  </div>
+  <div class="screen-scroll"><div class="screen-pad">
+    <div class="history-list" id="historyListContainer"></div>
+    <button type="button" class="btn btn-danger-ghost btn-block" id="clearAllHistoryBtn">সব মুছে ফেলুন</button>
+  </div></div>
+</div>
+
+<!-- ============ HISTORY VIEWER ============ -->
+<div class="app-screen" id="screen-history-viewer">
+  <div class="top-bar">
+    <button type="button" class="icon-btn" id="historyViewerBackBtn" aria-label="পেছনে যান">&#8592;</button>
+    <span class="top-bar-title" id="historyViewerTitle">রিপোর্ট</span>
+  </div>
+  <div class="screen-scroll"><div class="screen-pad" style="display:flex;flex-direction:column;align-items:center;">
+    <div class="report-preview-frame"><img id="historyViewerImg" alt="দৈনিক প্রোডাকশন রিপোর্ট"></div>
+    <div class="generated-actions">
+      <button type="button" class="btn btn-primary btn-block" id="historyViewerShareBtn">শেয়ার করুন</button>
+      <button type="button" class="btn btn-outline btn-block" id="historyViewerDownloadBtn">ডাউনলোড করুন</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ============ SETTINGS ============ -->
+<div class="app-screen" id="screen-settings">
+  <div class="top-bar">
+    <button type="button" class="icon-btn" id="settingsBackBtn" aria-label="পেছনে যান">&#8592;</button>
+    <span class="top-bar-title">সেটিংস</span>
+  </div>
+  <div class="screen-scroll"><div class="screen-pad">
+
+    <div class="settings-section">
+      <p class="settings-section-title">থিম</p>
+      <div class="theme-toggle-group" id="themeToggleGroup">
+        <button type="button" class="theme-toggle-btn" data-theme-choice="system">সিস্টেম</button>
+        <button type="button" class="theme-toggle-btn" data-theme-choice="light">লাইট</button>
+        <button type="button" class="theme-toggle-btn" data-theme-choice="dark">ডার্ক</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <p class="settings-section-title">পণ্য তালিকা পরিচালনা</p>
+      <div id="productManageList"></div>
+      <button type="button" class="btn btn-outline btn-small add-product-btn" id="addProductBtn">+ নতুন পণ্য যোগ করুন</button>
+    </div>
+
+    <div class="settings-section">
+      <p class="settings-section-title">প্রস্তুতকারীর নাম তালিকা</p>
+      <div id="preparerManageList"></div>
+      <button type="button" class="btn btn-outline btn-small add-product-btn" id="addPreparerBtn">+ নতুন নাম যোগ করুন</button>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- Preparer name modal (shown at the very start of the workflow) -->
+<div class="modal-overlay" id="preparerModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="preparerModalTitle">
+    <p class="modal-title" id="preparerModalTitle">প্রস্তুতকারীর নাম</p>
+    <p class="modal-message">রিপোর্ট শুরু করার আগে আপনার নাম নির্বাচন করুন।</p>
+    <select id="preparerModalSelect" aria-label="প্রস্তুতকারীর নাম" style="margin-bottom:1.1rem;width:100%;border:1.5px solid var(--border);border-radius:10px;padding:0.75rem 0.85rem;font-size:1rem;color:var(--ink);background:var(--surface);min-height:48px;"></select>
+    <div class="modal-actions">
+      <button type="button" id="preparerModalCancel" class="btn btn-ghost">বাতিল</button>
+      <button type="button" id="preparerModalConfirm" class="btn btn-primary">শুরু করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- Date edit modal -->
+<div class="modal-overlay" id="dateEditModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="dateEditModalTitle">
+    <p class="modal-title" id="dateEditModalTitle">তারিখ পরিবর্তন করুন</p>
+    <input type="date" id="dateEditModalInput" aria-label="রিপোর্টের তারিখ" style="margin-bottom:1.1rem;width:100%;border:1.5px solid var(--border);border-radius:10px;padding:0.75rem 0.85rem;font-size:1rem;color:var(--ink);background:var(--surface);min-height:48px;">
+    <div class="modal-actions">
+      <button type="button" id="dateEditModalCancel" class="btn btn-ghost">বাতিল</button>
+      <button type="button" id="dateEditModalConfirm" class="btn btn-primary">সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div class="modal-overlay" id="confirmModal" hidden>
+  <div class="modal-box" role="alertdialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <p class="modal-title" id="confirmModalTitle"></p>
+    <p class="modal-message" id="confirmModalMessage"></p>
+    <div class="modal-actions">
+      <button type="button" id="confirmModalCancel" class="btn btn-ghost">বাতিল</button>
+      <button type="button" id="confirmModalConfirm" class="btn btn-danger">নিশ্চিত করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =========================================================
+     CONSTANTS & STORAGE KEYS  (v2 — new data shape, fresh keys)
+  ========================================================= */
+  var LS_PRODUCTS = "mdpr_products_v2";
+  var LS_DRAFT = "mdpr_draft_v2";
+  var LS_HISTORY = "mdpr_history_v2";
+  var LS_SETTINGS = "mdpr_settings_v2";
+  var LS_LAST_CLOSING = "mdpr_last_closing_v2";
+  var LS_PREPARERS = "mdpr_preparers_v2";
+  var MAX_HISTORY = 7;
+  var DEFAULT_PREPARERS = ["মোঃ নাইম ইসলাম", "মোঃ আব্দুল মমিন"];
+
+  var DEFAULT_PRODUCTS = [
+    { id: "p1", name: "ব্রয়লার স্কিন সহ", unit: "Kg", isByProduct: false, isHidden: false },
+    { id: "p2", name: "হ্যান্ড ড্রেসিং", unit: "Kg", isByProduct: false, isHidden: false },
+    { id: "p3", name: "ব্রেস্ট বোনলেস", unit: "Kg", isByProduct: false, isHidden: false },
+    { id: "p4", name: "লেগ বোনলেস", unit: "Kg", isByProduct: false, isHidden: false },
+    { id: "p5", name: "হোল লেগ", unit: "Kg", isByProduct: false, isHidden: false },
+    { id: "p6", name: "উইংস", unit: "Kg", isByProduct: false, isHidden: false },
+    { id: "p7", name: "উইংস-রিজেক্ট", unit: "Kg", isByProduct: false, isHidden: false },
+    { id: "p8", name: "ড্রামস্টিক", unit: "Kg", isByProduct: false, isHidden: false },
+    { id: "p9", name: "গিলা-কলিজা", unit: "Kg", isByProduct: true, isHidden: false },
+    { id: "p10", name: "চিকেন বোন", unit: "Kg", isByProduct: true, isHidden: false },
+    { id: "p11", name: "টুকরা মাংস", unit: "Kg", isByProduct: false, isHidden: false }
+  ];
+
+  var currentDraft = null;
+  var editingPrevStockId = null;
+  var confirmCallback = null;
+  var preparerModalCallback = null;
+  var toastTimer = null;
+  var lastGeneratedCanvas = null;
+  var lastGeneratedFileName = "daily-production-report.png";
+  var currentHistoryViewerRecord = null;
+
+  /* =========================================================
+     GENERIC HELPERS
+  ========================================================= */
+
+  function parseNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function round2(n) {
+    return Math.round(n * 100) / 100;
+  }
+
+  function fmtNum(amount, decimals) {
+    decimals = decimals === undefined ? 2 : decimals;
+    var sign = amount < 0 ? "-" : "";
+    var abs = Math.abs(amount);
+    var fixed = abs.toFixed(decimals);
+    var parts = fixed.split(".");
+    var intPart = parts[0];
+    var decPart = parts[1];
+    var lastThree, other;
+    if (intPart.length > 3) {
+      lastThree = intPart.slice(-3);
+      other = intPart.slice(0, -3);
+    } else {
+      lastThree = intPart;
+      other = "";
+    }
+    if (other !== "") {
+      other = other.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
+      lastThree = "," + lastThree;
+    }
+    var grouped = other + lastThree;
+    return sign + grouped + (decPart !== undefined ? "." + decPart : "");
+  }
+
+  function fmtPct(n) {
+    return fmtNum(n, 1) + "%";
+  }
+
+  function sanitizeDecimalInput(e) {
+    var v = e.target.value;
+    v = v.replace(/[^0-9.]/g, "");
+    var firstDot = v.indexOf(".");
+    if (firstDot !== -1) {
+      v = v.slice(0, firstDot + 1) + v.slice(firstDot + 1).replace(/\./g, "");
+    }
+    e.target.value = v;
+  }
+
+  function sanitizeIntegerInput(e) {
+    var v = e.target.value;
+    v = v.replace(/[^0-9]/g, "");
+    e.target.value = v;
+  }
+
+  function formatBanglaDate(d) {
+    try {
+      return new Intl.DateTimeFormat("bn-BD-u-nu-latn", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).format(d);
+    } catch (e) {
+      return d.toISOString().slice(0, 10);
+    }
+  }
+
+  function formatBanglaTime(d) {
+    var hours24 = d.getHours();
+    var minutes = d.getMinutes();
+    var period;
+    if (hours24 < 4) period = "রাত";
+    else if (hours24 < 12) period = "সকাল";
+    else if (hours24 < 16) period = "দুপুর";
+    else if (hours24 < 20) period = "বিকাল";
+    else period = "রাত";
+    var hours12 = hours24 % 12;
+    if (hours12 === 0) hours12 = 12;
+    var mm = minutes < 10 ? "0" + minutes : String(minutes);
+    return hours12 + ":" + mm + " " + period;
+  }
+
+  function currentTimeHHMM() {
+    var d = new Date();
+    var h = String(d.getHours()).padStart(2, "0");
+    var m = String(d.getMinutes()).padStart(2, "0");
+    return h + ":" + m;
+  }
+
+  function uid() {
+    return "id" + Date.now().toString(36) + Math.floor(Math.random() * 1000);
+  }
+
+  function isoDateSlug(d) {
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+  }
+
+  function showToast(msg) {
+    var toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toast.hidden = true;
+    }, 2200);
+  }
+
+  var confirmCancelCallback = null;
+
+  function showConfirm(title, message, onConfirm, opts) {
+    opts = opts || {};
+    document.getElementById("confirmModalTitle").textContent = title;
+    document.getElementById("confirmModalMessage").textContent = message;
+    document.getElementById("confirmModalCancel").textContent = opts.cancelLabel || "বাতিল";
+    document.getElementById("confirmModalConfirm").textContent = opts.confirmLabel || "নিশ্চিত করুন";
+    confirmCallback = onConfirm;
+    confirmCancelCallback = opts.onCancel || null;
+    document.getElementById("confirmModal").hidden = false;
+  }
+
+  function showPreparerModal(onConfirm) {
+    var select = document.getElementById("preparerModalSelect");
+    var names = loadPreparers();
+    select.innerHTML = "";
+    names.forEach(function (name) {
+      var opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+    preparerModalCallback = onConfirm;
+    document.getElementById("preparerModal").hidden = false;
+  }
+
+  function showScreen(name) {
+    document.querySelectorAll(".app-screen").forEach(function (s) {
+      s.classList.remove("active");
+    });
+    document.getElementById("screen-" + name).classList.add("active");
+  }
+
+  /* =========================================================
+     STORAGE ACCESS
+  ========================================================= */
+
+  function safeGet(key) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function safeSet(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (e) {
+      showToast("ডেটা সংরক্ষণে সমস্যা হয়েছে");
+      return false;
+    }
+  }
+
+  function loadProducts() {
+    var products = safeGet(LS_PRODUCTS);
+    if (!products || !products.length) {
+      products = DEFAULT_PRODUCTS.slice();
+      safeSet(LS_PRODUCTS, products);
+    }
+    return products;
+  }
+
+  function saveProducts(products) {
+    safeSet(LS_PRODUCTS, products);
+  }
+
+  function getProductById(id) {
+    var products = loadProducts();
+    for (var i = 0; i < products.length; i++) {
+      if (products[i].id === id) return products[i];
+    }
+    return null;
+  }
+
+  function loadDraft() {
+    return safeGet(LS_DRAFT);
+  }
+
+  function saveDraft(draft) {
+    safeSet(LS_DRAFT, draft);
+  }
+
+  function clearDraft() {
+    try {
+      localStorage.removeItem(LS_DRAFT);
+    } catch (e) {}
+    currentDraft = null;
+  }
+
+  function loadHistory() {
+    return safeGet(LS_HISTORY) || [];
+  }
+
+  function saveHistory(history) {
+    safeSet(LS_HISTORY, history);
+  }
+
+  function loadLastClosing() {
+    return safeGet(LS_LAST_CLOSING) || {};
+  }
+
+  function saveLastClosing(map) {
+    safeSet(LS_LAST_CLOSING, map);
+  }
+
+  function loadPreparers() {
+    var list = safeGet(LS_PREPARERS);
+    if (!list || !list.length) {
+      list = DEFAULT_PREPARERS.slice();
+      safeSet(LS_PREPARERS, list);
+    }
+    return list;
+  }
+
+  function savePreparers(list) {
+    safeSet(LS_PREPARERS, list);
+  }
+
+  function loadSettings() {
+    return safeGet(LS_SETTINGS) || { theme: "system" };
+  }
+
+  function saveSettings(settings) {
+    safeSet(LS_SETTINGS, settings);
+  }
+
+  /* =========================================================
+     THEME
+  ========================================================= */
+
+  function applyTheme() {
+    var settings = loadSettings();
+    var resolved = settings.theme;
+    if (resolved === "system" || !resolved) {
+      resolved = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    document.documentElement.setAttribute("data-theme", resolved);
+  }
+
+  function setTheme(choice) {
+    var settings = loadSettings();
+    settings.theme = choice;
+    saveSettings(settings);
+    applyTheme();
+    renderThemeToggle();
+  }
+
+  function renderThemeToggle() {
+    var settings = loadSettings();
+    var current = settings.theme || "system";
+    document.querySelectorAll(".theme-toggle-btn").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-theme-choice") === current);
+    });
+  }
+
+  if (window.matchMedia) {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+      var settings = loadSettings();
+      if (!settings.theme || settings.theme === "system") applyTheme();
+    });
+  }
+
+  /* =========================================================
+     HOME SCREEN
+  ========================================================= */
+
+  function renderHome() {
+    document.getElementById("homeDateDisplay").textContent = formatBanglaDate(new Date());
+    var actions = document.getElementById("homeActions");
+    actions.innerHTML = "";
+
+    var draft = loadDraft();
+
+    if (draft) {
+      var completedCount = 0;
+      (draft.productIds || []).forEach(function (pid) {
+        var entry = draft.entries[pid];
+        if (entry && (entry.production !== "" || entry.delivery !== "")) completedCount++;
+      });
+
+      var continueBtn = document.createElement("button");
+      continueBtn.type = "button";
+      continueBtn.className = "btn btn-primary btn-block";
+      continueBtn.textContent = "চলমান রিপোর্ট চালিয়ে যান";
+      continueBtn.addEventListener("click", function () {
+        if (!draft.preparerName) {
+          showPreparerModal(function (name) {
+            draft.preparerName = name;
+            saveDraft(draft);
+            currentDraft = draft;
+            showScreen("data-entry");
+            renderDataEntryScreen();
+          });
+        } else {
+          currentDraft = draft;
+          showScreen("data-entry");
+          renderDataEntryScreen();
+        }
+      });
+      actions.appendChild(continueBtn);
+
+      var note = document.createElement("p");
+      note.className = "home-draft-note";
+      note.textContent = completedCount + " টি পণ্যের তথ্য দেওয়া হয়েছে";
+      actions.appendChild(note);
+
+      var discardBtn = document.createElement("button");
+      discardBtn.type = "button";
+      discardBtn.className = "home-discard-link";
+      discardBtn.textContent = "নতুন করে শুরু করুন";
+      discardBtn.addEventListener("click", function () {
+        showConfirm("নতুন করে শুরু করবেন?", "বর্তমান অসম্পূর্ণ রিপোর্টের তথ্য মুছে যাবে।", function () {
+          clearDraft();
+          showPreparerModal(function (name) {
+            askCarryForward(function (carryForward) {
+              startNewDraft(name, carryForward);
+            });
+          });
+        });
+      });
+      actions.appendChild(discardBtn);
+    } else {
+      var startBtn = document.createElement("button");
+      startBtn.type = "button";
+      startBtn.className = "btn btn-primary btn-block";
+      startBtn.textContent = "নতুন রিপোর্ট শুরু করুন";
+      startBtn.addEventListener("click", function () {
+        showPreparerModal(function (name) {
+          askCarryForward(function (carryForward) {
+            startNewDraft(name, carryForward);
+          });
+        });
+      });
+      actions.appendChild(startBtn);
+    }
+  }
+
+  function askCarryForward(callback) {
+    showConfirm(
+      "পূর্ববর্তী স্টক",
+      "আগের রিপোর্টের ফাইনাল স্টক কি আজকের পূর্ববর্তী স্টক হিসেবে ব্যবহার করবেন?",
+      function () { callback(true); },
+      { confirmLabel: "হ্যাঁ", cancelLabel: "না", onCancel: function () { callback(false); } }
+    );
+  }
+
+  function startNewDraft(preparerName, carryForward) {
+    var allProducts = loadProducts();
+    var products = allProducts.filter(function (p) { return !p.isHidden; });
+    if (!products.length) {
+      showToast("প্রথমে সেটিংস থেকে পণ্য যোগ করুন");
+      renderSettings();
+      showScreen("settings");
+      return;
+    }
+    var lastClosing = loadLastClosing();
+    var entries = {};
+    products.forEach(function (p) {
+      var opening = carryForward ? (lastClosing[p.id] || 0) : 0;
+      entries[p.id] = { opening: opening, production: "", delivery: "" };
+    });
+    var now = new Date();
+    var draft = {
+      dateStr: formatBanglaDate(now),
+      isoDate: isoDateSlug(now),
+      startedAt: now.getTime(),
+      receiveEntries: [],
+      productIds: products.map(function (p) { return p.id; }),
+      entries: entries,
+      note: "",
+      preparerName: preparerName || "",
+      finalizedRecordId: null
+    };
+    saveDraft(draft);
+    currentDraft = draft;
+    showScreen("data-entry");
+    renderDataEntryScreen();
+  }
+
+  /* =========================================================
+     DATA ENTRY SCREEN
+  ========================================================= */
+
+  function renderDataEntryScreen() {
+    if (!currentDraft) {
+      currentDraft = loadDraft();
+      if (!currentDraft) {
+        showScreen("home");
+        renderHome();
+        return;
+      }
+    }
+    cachedProductOrder = null;
+    document.getElementById("dataEntryPreparerDisplay").textContent =
+      "প্রস্তুতকারী: " + (currentDraft.preparerName || "--");
+    document.getElementById("dataEntryDateDisplay").textContent = currentDraft.dateStr;
+    renderReceiveEntries();
+    renderProductEntryCards();
+  }
+
+  function renderReceiveEntries() {
+    var container = document.getElementById("receiveEntriesList");
+    container.innerHTML = "";
+
+    if (!currentDraft.receiveEntries.length) {
+      var empty = document.createElement("p");
+      empty.className = "receive-empty-note";
+      empty.textContent = "এখনো কোনো রিসিভ এন্ট্রি যোগ করা হয়নি।";
+      container.appendChild(empty);
+    }
+
+    currentDraft.receiveEntries.forEach(function (entry) {
+      var card = document.createElement("div");
+      card.className = "receive-entry-card";
+
+      var top = document.createElement("div");
+      top.className = "receive-entry-top";
+
+      var timeInput = document.createElement("input");
+      timeInput.type = "time";
+      timeInput.value = entry.time || "";
+      timeInput.setAttribute("aria-label", "সময়");
+      timeInput.addEventListener("input", function (e) {
+        entry.time = e.target.value;
+        saveDraft(currentDraft);
+      });
+
+      var delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "receive-delete-btn";
+      delBtn.innerHTML = "&times;";
+      delBtn.setAttribute("aria-label", "এই এন্ট্রি মুছুন");
+      delBtn.addEventListener("click", function () {
+        currentDraft.receiveEntries = currentDraft.receiveEntries.filter(function (r) {
+          return r.id !== entry.id;
+        });
+        saveDraft(currentDraft);
+        renderReceiveEntries();
+      });
+
+      top.appendChild(timeInput);
+      top.appendChild(delBtn);
+      card.appendChild(top);
+
+      var grid = document.createElement("div");
+      grid.className = "receive-entry-grid";
+
+      var sizeField = document.createElement("div");
+      sizeField.className = "receive-entry-field";
+      sizeField.innerHTML = "<label>সাইজ</label>";
+      var sizeInput = document.createElement("input");
+      sizeInput.type = "text";
+      sizeInput.placeholder = "e.g. 1.4-1.6";
+      sizeInput.value = entry.size || "";
+      sizeInput.setAttribute("aria-label", "সাইজ");
+      sizeInput.addEventListener("input", function (e) {
+        entry.size = e.target.value;
+        saveDraft(currentDraft);
+      });
+      sizeField.appendChild(sizeInput);
+
+      var piecesField = document.createElement("div");
+      piecesField.className = "receive-entry-field";
+      piecesField.innerHTML = "<label>পিস</label>";
+      var piecesInput = document.createElement("input");
+      piecesInput.type = "text";
+      piecesInput.inputMode = "numeric";
+      piecesInput.className = "numeric-input";
+      piecesInput.placeholder = "0";
+      piecesInput.value = entry.pieces || "";
+      piecesInput.setAttribute("aria-label", "পিস");
+      piecesInput.addEventListener("input", function (e) {
+        sanitizeIntegerInput(e);
+        entry.pieces = e.target.value;
+        saveDraft(currentDraft);
+        recalcReceiveTotals();
+      });
+      piecesField.appendChild(piecesInput);
+
+      var weightField = document.createElement("div");
+      weightField.className = "receive-entry-field";
+      weightField.innerHTML = "<label>ওজন (Kg)</label>";
+      var weightInput = document.createElement("input");
+      weightInput.type = "text";
+      weightInput.inputMode = "decimal";
+      weightInput.className = "numeric-input";
+      weightInput.placeholder = "0.00";
+      weightInput.value = entry.weight || "";
+      weightInput.setAttribute("aria-label", "ওজন (Kg)");
+      weightInput.addEventListener("input", function (e) {
+        sanitizeDecimalInput(e);
+        entry.weight = e.target.value;
+        saveDraft(currentDraft);
+        recalcReceiveTotals();
+      });
+      weightField.appendChild(weightInput);
+
+      grid.appendChild(sizeField);
+      grid.appendChild(piecesField);
+      grid.appendChild(weightField);
+      card.appendChild(grid);
+
+      container.appendChild(card);
+    });
+
+    recalcReceiveTotals();
+  }
+
+  function recalcReceiveTotals() {
+    var totalPieces = 0;
+    var totalWeight = 0;
+    currentDraft.receiveEntries.forEach(function (entry) {
+      totalPieces += parseNum(entry.pieces);
+      totalWeight += parseNum(entry.weight);
+    });
+    document.getElementById("totalPiecesDisplay").textContent = fmtNum(totalPieces, 0);
+    document.getElementById("totalLiveWeightDisplay").textContent = fmtNum(round2(totalWeight)) + " Kg";
+  }
+
+  function addReceiveEntry() {
+    currentDraft.receiveEntries.push({
+      id: uid(),
+      time: currentTimeHHMM(),
+      size: "",
+      pieces: "",
+      weight: ""
+    });
+    saveDraft(currentDraft);
+    renderReceiveEntries();
+  }
+
+  function totalLiveWeight() {
+    var total = 0;
+    currentDraft.receiveEntries.forEach(function (entry) {
+      total += parseNum(entry.weight);
+    });
+    return round2(total);
+  }
+
+  function totalLivePieces() {
+    var total = 0;
+    currentDraft.receiveEntries.forEach(function (entry) {
+      total += parseNum(entry.pieces);
+    });
+    return total;
+  }
+
+  function computeClosing(entry) {
+    return round2(parseNum(entry.opening) + parseNum(entry.production) - parseNum(entry.delivery));
+  }
+
+  var cachedProductOrder = null;
+
+  function getOrderedProductIdsForDisplay(forceRecompute) {
+    if (cachedProductOrder && !forceRecompute) return cachedProductOrder;
+    var ids = currentDraft.productIds.slice();
+    ids.sort(function (a, b) {
+      var entryA = currentDraft.entries[a];
+      var entryB = currentDraft.entries[b];
+      var hasA = entryA && parseNum(entryA.opening) !== 0;
+      var hasB = entryB && parseNum(entryB.opening) !== 0;
+      if (hasA && !hasB) return -1;
+      if (!hasA && hasB) return 1;
+      return 0;
+    });
+    cachedProductOrder = ids;
+    return ids;
+  }
+
+  function renderProductEntryCards() {
+    var container = document.getElementById("productEntryList");
+    container.innerHTML = "";
+
+    getOrderedProductIdsForDisplay().forEach(function (pid) {
+      var product = getProductById(pid) || { name: "অজানা পণ্য", unit: "Kg", isByProduct: false };
+      if (product.isHidden) return;
+      var entry = currentDraft.entries[pid];
+      if (!entry) return;
+
+      var card = document.createElement("div");
+      card.className = "product-entry-card";
+
+      var header = document.createElement("div");
+      header.className = "product-entry-header";
+
+      var nameEl = document.createElement("span");
+      nameEl.className = "product-entry-name";
+      nameEl.textContent = product.name;
+      if (product.isByProduct) {
+        var tag = document.createElement("span");
+        tag.className = "byproduct-tag";
+        tag.textContent = "বাই-প্রোডাক্ট";
+        nameEl.appendChild(tag);
+      }
+      header.appendChild(nameEl);
+
+      if (editingPrevStockId === pid) {
+        var editRow = document.createElement("div");
+        editRow.className = "prev-stock-edit-row";
+        var prevInput = document.createElement("input");
+        prevInput.type = "text";
+        prevInput.inputMode = "decimal";
+        prevInput.className = "numeric-input";
+        prevInput.value = String(entry.opening || 0);
+        prevInput.setAttribute("aria-label", "পূর্ববর্তী স্টক সংশোধন করুন");
+        var doneBtn = document.createElement("button");
+        doneBtn.type = "button";
+        doneBtn.textContent = "সম্পন্ন";
+        var closeEditor = function () {
+          editingPrevStockId = null;
+          renderProductEntryCards();
+        };
+        prevInput.addEventListener("input", function (e) {
+          sanitizeDecimalInput(e);
+          entry.opening = parseNum(e.target.value);
+          saveDraft(currentDraft);
+          recalcFinal();
+        });
+        prevInput.addEventListener("blur", closeEditor);
+        doneBtn.addEventListener("click", closeEditor);
+        editRow.appendChild(prevInput);
+        editRow.appendChild(doneBtn);
+        header.appendChild(editRow);
+      } else {
+        var pill = document.createElement("button");
+        pill.type = "button";
+        pill.className = "prev-stock-pill";
+        pill.textContent = "পূর্ববর্তী স্টক: " + fmtNum(entry.opening || 0) + " " + product.unit;
+        pill.addEventListener("click", function () {
+          editingPrevStockId = pid;
+          renderProductEntryCards();
+        });
+        header.appendChild(pill);
+      }
+
+      card.appendChild(header);
+
+      var fields = document.createElement("div");
+      fields.className = "product-entry-fields";
+
+      var prodField = document.createElement("div");
+      prodField.className = "product-entry-field";
+      prodField.innerHTML = "<label>প্রোডাকশন (" + product.unit + ")</label>";
+      var prodInput = document.createElement("input");
+      prodInput.type = "text";
+      prodInput.inputMode = "decimal";
+      prodInput.className = "numeric-input";
+      prodInput.placeholder = "0.00";
+      prodInput.value = entry.production || "";
+      prodInput.setAttribute("aria-label", "প্রোডাকশন - " + product.name);
+      prodField.appendChild(prodInput);
+
+      var delField = document.createElement("div");
+      delField.className = "product-entry-field";
+      delField.innerHTML = "<label>ডেলিভারি (" + product.unit + ")</label>";
+      var delInput = document.createElement("input");
+      delInput.type = "text";
+      delInput.inputMode = "decimal";
+      delInput.className = "numeric-input";
+      delInput.placeholder = "0.00";
+      delInput.value = entry.delivery || "";
+      delInput.setAttribute("aria-label", "ডেলিভারি - " + product.name);
+      delField.appendChild(delInput);
+
+      fields.appendChild(prodField);
+      fields.appendChild(delField);
+      card.appendChild(fields);
+
+      var finalRow = document.createElement("div");
+      finalRow.className = "product-entry-final";
+      finalRow.innerHTML = "<span>ফাইনাল স্টক</span><span class=\"final-stock-value\">0.00 " + product.unit + "</span>";
+      card.appendChild(finalRow);
+
+      var finalValueEl = finalRow.querySelector(".final-stock-value");
+
+      function recalcFinal() {
+        var closing = computeClosing(entry);
+        finalValueEl.textContent = fmtNum(closing) + " " + product.unit;
+        finalValueEl.classList.toggle("negative", closing < 0);
+      }
+
+      prodInput.addEventListener("input", function (e) {
+        sanitizeDecimalInput(e);
+        entry.production = e.target.value;
+        saveDraft(currentDraft);
+        recalcFinal();
+      });
+      delInput.addEventListener("input", function (e) {
+        sanitizeDecimalInput(e);
+        entry.delivery = e.target.value;
+        saveDraft(currentDraft);
+        recalcFinal();
+      });
+
+      recalcFinal();
+      container.appendChild(card);
+    });
+  }
+
+  /* =========================================================
+     TOTALS / YIELD CALCULATION
+  ========================================================= */
+
+  function computeReportTotals() {
+    var totalProduction = 0;
+    var totalDelivery = 0;
+    var totalClosing = 0;
+    var totalSaleableMeat = 0;
+    var totalByProduct = 0;
+
+    currentDraft.productIds.forEach(function (pid) {
+      var product = getProductById(pid);
+      var entry = currentDraft.entries[pid];
+      if (!entry) return;
+      var production = parseNum(entry.production);
+      totalProduction += production;
+      totalDelivery += parseNum(entry.delivery);
+      totalClosing += computeClosing(entry);
+      if (product && product.isByProduct) {
+        totalByProduct += production;
+      } else {
+        totalSaleableMeat += production;
+      }
+    });
+
+    var liveWeight = totalLiveWeight();
+    var totalFinishedProduct = totalSaleableMeat + totalByProduct;
+    var wastage = round2(liveWeight - totalFinishedProduct);
+
+    var meatYieldPct = liveWeight > 0 ? round2((totalSaleableMeat / liveWeight) * 100) : 0;
+    var byProductPct = liveWeight > 0 ? round2((totalByProduct / liveWeight) * 100) : 0;
+    var wastagePct = liveWeight > 0 ? round2((wastage / liveWeight) * 100) : 0;
+
+    return {
+      totalProduction: round2(totalProduction),
+      totalDelivery: round2(totalDelivery),
+      totalClosing: round2(totalClosing),
+      totalSaleableMeat: round2(totalSaleableMeat),
+      totalByProduct: round2(totalByProduct),
+      liveWeight: liveWeight,
+      livePieces: totalLivePieces(),
+      wastage: wastage,
+      meatYieldPct: meatYieldPct,
+      byProductPct: byProductPct,
+      wastagePct: wastagePct
+    };
+  }
+
+  /* =========================================================
+     REVIEW SCREEN
+  ========================================================= */
+
+  function goToReview() {
+    renderReviewScreen();
+    showScreen("review");
+  }
+
+  function renderReviewScreen() {
+    var totals = computeReportTotals();
+
+    // Receive summary
+    var receiveList = document.getElementById("reviewReceiveList");
+    receiveList.innerHTML = "";
+    if (!currentDraft.receiveEntries.length) {
+      var emptyR = document.createElement("p");
+      emptyR.className = "receive-empty-note";
+      emptyR.textContent = "কোনো রিসিভ এন্ট্রি দেওয়া হয়নি।";
+      receiveList.appendChild(emptyR);
+    } else {
+      currentDraft.receiveEntries.forEach(function (entry) {
+        var row = document.createElement("div");
+        row.className = "review-summary-row";
+        row.innerHTML =
+          "<span>" + (entry.time || "--") + (entry.size ? " \u00B7 " + entry.size : "") + "</span>" +
+          "<span class=\"review-summary-figures\"><span>পিস: <b>" + fmtNum(parseNum(entry.pieces), 0) + "</b></span>" +
+          "<span>ওজন: <b>" + fmtNum(parseNum(entry.weight)) + " Kg</b></span></span>";
+        receiveList.appendChild(row);
+      });
+    }
+    var receiveTotalsRow = document.createElement("div");
+    receiveTotalsRow.className = "review-summary-row";
+    receiveTotalsRow.innerHTML =
+      "<span><b>মোট</b></span>" +
+      "<span class=\"review-summary-figures\"><span>পিস: <b>" + fmtNum(totals.livePieces, 0) + "</b></span>" +
+      "<span>ওজন: <b>" + fmtNum(totals.liveWeight) + " Kg</b></span></span>";
+    receiveList.appendChild(receiveTotalsRow);
+
+    // Product summary (previous-balance products first, hidden products excluded)
+    var productList = document.getElementById("reviewProductList");
+    productList.innerHTML = "";
+    getOrderedProductIdsForDisplay().forEach(function (pid) {
+      var product = getProductById(pid) || { name: "অজানা পণ্য", unit: "Kg" };
+      if (product.isHidden) return;
+      var entry = currentDraft.entries[pid];
+      var closing = computeClosing(entry);
+      var row = document.createElement("div");
+      row.className = "review-summary-row";
+      row.innerHTML =
+        "<span>" + product.name + "</span>" +
+        "<span class=\"review-summary-figures\">" +
+        "<span>প্রোডাকশন: <b>" + fmtNum(parseNum(entry.production)) + "</b></span>" +
+        "<span>ডেলিভারি: <b>" + fmtNum(parseNum(entry.delivery)) + "</b></span>" +
+        "<span>ফাইনাল স্টক: <b>" + fmtNum(closing) + "</b></span>" +
+        "</span>";
+      productList.appendChild(row);
+    });
+
+    // Production summary grid
+    var yieldGrid = document.getElementById("yieldSummaryGrid");
+    yieldGrid.innerHTML = "";
+    var yieldItems = [
+      { label: "মোট লাইভ মুরগি", value: fmtNum(totals.liveWeight) + " Kg" },
+      { label: "মোট প্রোডাকশন", value: fmtNum(totals.totalProduction) + " Kg" },
+      { label: "বিক্রয়যোগ্য মাংস", value: fmtNum(totals.totalSaleableMeat) + " Kg" },
+      { label: "বাই-প্রোডাক্ট", value: fmtNum(totals.totalByProduct) + " Kg" },
+      { label: "ফাইনাল স্টক", value: fmtNum(totals.totalClosing) + " Kg" },
+      { label: "ওয়েস্টেজ", value: fmtNum(totals.wastage) + " Kg", negative: totals.wastage < 0 },
+      { label: "বিক্রয়যোগ্য মাংস %", value: fmtPct(totals.meatYieldPct) },
+      { label: "বাই-প্রোডাক্ট %", value: fmtPct(totals.byProductPct) },
+      { label: "ওয়েস্টেজ %", value: fmtPct(totals.wastagePct), negative: totals.wastagePct < 0 }
+    ];
+    yieldItems.forEach(function (item) {
+      var card = document.createElement("div");
+      card.className = "review-total-card";
+      card.innerHTML =
+        "<p class=\"review-total-label\">" + item.label + "</p>" +
+        "<p class=\"review-total-value" + (item.negative ? " negative" : "") + "\">" + item.value + "</p>";
+      yieldGrid.appendChild(card);
+    });
+
+    document.getElementById("reviewNoteInput").value = currentDraft.note || "";
+    document.getElementById("reviewPreparerDisplay").textContent = currentDraft.preparerName || "--";
+  }
+
+  /* =========================================================
+     REPORT FINALIZATION
+  ========================================================= */
+
+  function finalizeReport() {
+    if (!currentDraft.preparerName) {
+      showPreparerModal(function (name) {
+        currentDraft.preparerName = name;
+        saveDraft(currentDraft);
+        document.getElementById("reviewPreparerDisplay").textContent = name;
+        finalizeReport();
+      });
+      return;
+    }
+    var preparerName = currentDraft.preparerName;
+
+    currentDraft.note = document.getElementById("reviewNoteInput").value.trim();
+    saveDraft(currentDraft);
+
+    var now = new Date();
+    var totals = computeReportTotals();
+
+    var productSnapshots = getOrderedProductIdsForDisplay()
+      .filter(function (pid) {
+        var product = getProductById(pid);
+        return !(product && product.isHidden);
+      })
+      .map(function (pid) {
+        var product = getProductById(pid) || { name: "অজানা পণ্য", unit: "Kg", isByProduct: false };
+        var entry = currentDraft.entries[pid];
+        return {
+          id: pid,
+          name: product.name,
+          unit: product.unit,
+          isByProduct: !!product.isByProduct,
+          opening: parseNum(entry.opening),
+          production: parseNum(entry.production),
+          delivery: parseNum(entry.delivery),
+          closing: computeClosing(entry)
+        };
+      });
+
+    var receiveSnapshots = currentDraft.receiveEntries.map(function (entry) {
+      return {
+        time: entry.time || "",
+        size: entry.size || "",
+        pieces: parseNum(entry.pieces),
+        weight: parseNum(entry.weight)
+      };
+    });
+
+    var recordId = currentDraft.finalizedRecordId || now.getTime();
+
+    var record = {
+      id: recordId,
+      dateStr: currentDraft.dateStr,
+      timeStr: formatBanglaTime(now),
+      isoDate: currentDraft.isoDate || isoDateSlug(now),
+      preparerName: preparerName,
+      note: currentDraft.note || "",
+      receiveEntries: receiveSnapshots,
+      productSnapshots: productSnapshots,
+      totals: totals
+    };
+
+    var lastClosing = loadLastClosing();
+    productSnapshots.forEach(function (p) {
+      lastClosing[p.id] = p.closing;
+    });
+    saveLastClosing(lastClosing);
+
+    var canvas = buildReportCanvas(record);
+    var pngDataUrl = "";
+    try {
+      pngDataUrl = canvas.toDataURL("image/png");
+    } catch (e) {
+      showToast("ছবি তৈরি করতে সমস্যা হয়েছে");
+    }
+    record.pngDataUrl = pngDataUrl;
+
+    var history = loadHistory();
+    var existingIdx = -1;
+    history.forEach(function (r, idx) {
+      if (r.id === recordId) existingIdx = idx;
+    });
+    if (existingIdx !== -1) {
+      history[existingIdx] = record;
+    } else {
+      history.unshift(record);
+      if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
+    }
+    saveHistory(history);
+
+    currentDraft.finalizedRecordId = recordId;
+    saveDraft(currentDraft);
+
+    lastGeneratedCanvas = canvas;
+    lastGeneratedFileName = "daily-production-report-" + (record.isoDate || isoDateSlug(now)) + ".png";
+
+    document.getElementById("generatedImg").src = pngDataUrl;
+    showScreen("generated");
+  }
+
+  /* =========================================================
+     CANVAS REPORT RENDERER
+  ========================================================= */
+
+  function wrapText(ctx, text, maxWidth) {
+    var words = text.split(/\s+/).filter(Boolean);
+    var lines = [];
+    var current = "";
+    words.forEach(function (word) {
+      var test = current ? current + " " + word : word;
+      if (ctx.measureText(test).width > maxWidth && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = test;
+      }
+    });
+    if (current) lines.push(current);
+    return lines;
+  }
+
+  function buildReportCanvas(record) {
+    var W = 1080;
+    var pad = 56;
+    var contentW = W - pad * 2;
+
+    var colors = {
+      paper: "#F3F5EF",
+      ink: "#1F2E2B",
+      inkSoft: "#57675F",
+      inkFaint: "#8B968E",
+      accent: "#2F6F5E",
+      accentDeep: "#1B4A3D",
+      accentSoft: "#E6EFEA",
+      border: "#DDE3D8",
+      rowStripe: "rgba(47,111,94,0.05)",
+      bad: "#B3261E"
+    };
+
+    var measureCanvas = document.createElement("canvas");
+    var mctx = measureCanvas.getContext("2d");
+    mctx.font = "500 26px sans-serif";
+    var noteLines = [];
+    if (record.note && record.note.trim()) {
+      noteLines = wrapText(mctx, record.note.trim(), contentW - 4);
+    }
+
+    // Only include products with actual activity; order is inherited as-is (no re-sorting)
+    var visibleSnapshots = record.productSnapshots.filter(function (p) {
+      return p.opening !== 0 || p.production !== 0 || p.delivery !== 0 || p.closing !== 0;
+    });
+
+    var headerH = 205;
+    var sectionGap = 24;
+    var subheadH = 40;
+
+    var hasReceive = record.receiveEntries.length > 0;
+    var receiveHeaderH = hasReceive ? 50 : 0;
+    var receiveRowH = 46;
+    var receiveRowsH = record.receiveEntries.length * receiveRowH;
+    var receiveBlockH = hasReceive ? subheadH + receiveHeaderH + receiveRowsH + 10 : 0;
+
+    var productHeaderH = 54;
+    var productRowH = 58;
+    var productRowsH = (visibleSnapshots.length > 0 ? visibleSnapshots.length : 1) * productRowH;
+    var totalsRowH = 62;
+    var productBlockH = subheadH + productHeaderH + productRowsH + totalsRowH;
+
+    var yieldBlockH = subheadH + 305;
+
+    var noteH = noteLines.length ? 44 + noteLines.length * 34 + 14 : 0;
+    var footerH = 90;
+
+    var H =
+      pad + headerH + sectionGap +
+      (hasReceive ? receiveBlockH + sectionGap : 0) +
+      productBlockH + sectionGap +
+      yieldBlockH + sectionGap +
+      noteH + footerH + pad;
+
+    var canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = Math.round(H);
+    var ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = colors.paper;
+    ctx.fillRect(0, 0, W, H);
+
+    var y = pad;
+    ctx.textBaseline = "alphabetic";
+
+    ctx.fillStyle = colors.accentDeep;
+    ctx.font = "700 42px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("Murgi.net", pad, y + 40);
+
+    ctx.font = "600 28px sans-serif";
+    ctx.fillStyle = colors.accent;
+    ctx.fillText("দৈনিক প্রোডাকশন রিপোর্ট", pad, y + 80);
+
+    ctx.font = "700 25px sans-serif";
+    ctx.fillStyle = colors.ink;
+    ctx.fillText("প্রস্তুতকারী: " + record.preparerName, pad, y + 118);
+
+    ctx.font = "500 22px sans-serif";
+    ctx.fillStyle = colors.inkSoft;
+    ctx.textAlign = "right";
+    ctx.fillText("তারিখ: " + record.dateStr, W - pad, y + 40);
+    ctx.fillText("সময়: " + record.timeStr, W - pad, y + 72);
+
+    ctx.strokeStyle = colors.accentDeep;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(pad, y + headerH - 16);
+    ctx.lineTo(W - pad, y + headerH - 16);
+    ctx.stroke();
+
+    y += headerH + sectionGap;
+
+    function drawSubhead(text) {
+      ctx.font = "700 25px sans-serif";
+      ctx.fillStyle = colors.accentDeep;
+      ctx.textAlign = "left";
+      ctx.fillText(text, pad, y + 26);
+      y += subheadH;
+    }
+
+    // ---- Receive table ----
+    if (hasReceive) {
+      drawSubhead("লাইভ মুরগি রিসিভ");
+
+      var rCols = [
+        { label: "সময়", w: 0.2, align: "left" },
+        { label: "সাইজ", w: 0.28, align: "left" },
+        { label: "পিস", w: 0.24, align: "right" },
+        { label: "ওজন (Kg)", w: 0.28, align: "right" }
+      ];
+      var rColX = [];
+      var rAcc = pad;
+      rCols.forEach(function (c) {
+        rColX.push(rAcc);
+        rAcc += contentW * c.w;
+      });
+
+      ctx.fillStyle = colors.accentSoft;
+      ctx.fillRect(pad, y, contentW, receiveHeaderH);
+      ctx.font = "700 20px sans-serif";
+      ctx.fillStyle = colors.accentDeep;
+      rCols.forEach(function (c, i) {
+        ctx.textAlign = c.align;
+        var tx = c.align === "right" ? rColX[i] + contentW * c.w - 14 : rColX[i] + 14;
+        ctx.fillText(c.label, tx, y + receiveHeaderH / 2 + 7);
+      });
+      y += receiveHeaderH;
+
+      record.receiveEntries.forEach(function (entry, idx) {
+        if (idx % 2 === 1) {
+          ctx.fillStyle = colors.rowStripe;
+          ctx.fillRect(pad, y, contentW, receiveRowH);
+        }
+        ctx.font = "500 21px sans-serif";
+        ctx.fillStyle = colors.ink;
+        ctx.textAlign = "left";
+        ctx.fillText(entry.time || "--", rColX[0] + 14, y + receiveRowH / 2 + 7);
+        ctx.fillText(entry.size || "--", rColX[1] + 14, y + receiveRowH / 2 + 7);
+
+        ctx.font = "600 21px monospace";
+        ctx.textAlign = "right";
+        ctx.fillText(fmtNum(entry.pieces, 0), rColX[2] + contentW * rCols[2].w - 14, y + receiveRowH / 2 + 7);
+        ctx.fillText(fmtNum(entry.weight), rColX[3] + contentW * rCols[3].w - 14, y + receiveRowH / 2 + 7);
+
+        ctx.strokeStyle = colors.border;
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(pad, y + receiveRowH);
+        ctx.lineTo(W - pad, y + receiveRowH);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        y += receiveRowH;
+      });
+
+      y += 10 + sectionGap;
+    }
+
+    // ---- Product table ----
+    drawSubhead("প্রোডাক্ট সামারি");
+
+    var cols = [
+      { label: "পণ্য", w: 0.34, align: "left" },
+      { label: "পূর্বের স্টক", w: 0.19, align: "right" },
+      { label: "প্রোডাকশন", w: 0.16, align: "right" },
+      { label: "ডেলিভারি", w: 0.15, align: "right" },
+      { label: "ফাইনাল স্টক", w: 0.16, align: "right" }
+    ];
+    var colX = [];
+    var acc = pad;
+    cols.forEach(function (c) {
+      colX.push(acc);
+      acc += contentW * c.w;
+    });
+
+    ctx.fillStyle = colors.accentSoft;
+    ctx.fillRect(pad, y, contentW, productHeaderH);
+    ctx.font = "700 20px sans-serif";
+    ctx.fillStyle = colors.accentDeep;
+    cols.forEach(function (c, i) {
+      ctx.textAlign = c.align;
+      var tx = c.align === "right" ? colX[i] + contentW * c.w - 14 : colX[i] + 14;
+      ctx.fillText(c.label, tx, y + productHeaderH / 2 + 7);
+    });
+    y += productHeaderH;
+
+    var totalProduction = 0;
+    var totalDelivery = 0;
+    var totalClosing = 0;
+
+    if (visibleSnapshots.length === 0) {
+      ctx.font = "500 22px sans-serif";
+      ctx.fillStyle = colors.inkFaint;
+      ctx.textAlign = "left";
+      ctx.fillText("কোনো পণ্যের তথ্য নেই", colX[0] + 14, y + productRowH / 2 + 7);
+      y += productRowH;
+    } else {
+      visibleSnapshots.forEach(function (p, idx) {
+        if (idx % 2 === 1) {
+          ctx.fillStyle = colors.rowStripe;
+          ctx.fillRect(pad, y, contentW, productRowH);
+        }
+        ctx.font = "600 22px sans-serif";
+        ctx.fillStyle = colors.ink;
+        ctx.textAlign = "left";
+        var label = p.name + (p.isByProduct ? "  (বাই-প্রোডাক্ট)" : "");
+        ctx.fillText(label, colX[0] + 14, y + productRowH / 2 + 7);
+
+        var vals = [p.opening, p.production, p.delivery, p.closing];
+        vals.forEach(function (val, ci) {
+          var i = ci + 1;
+          ctx.textAlign = "right";
+          ctx.font = "600 22px monospace";
+          ctx.fillStyle = ci === 3 ? colors.accentDeep : colors.inkSoft;
+          var tx = colX[i] + contentW * cols[i].w - 14;
+          ctx.fillText(fmtNum(val), tx, y + productRowH / 2 + 7);
+        });
+
+        ctx.strokeStyle = colors.border;
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(pad, y + productRowH);
+        ctx.lineTo(W - pad, y + productRowH);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        totalProduction += p.production;
+        totalDelivery += p.delivery;
+        totalClosing += p.closing;
+
+        y += productRowH;
+      });
+    }
+
+    ctx.strokeStyle = colors.accentDeep;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(pad, y);
+    ctx.lineTo(W - pad, y);
+    ctx.stroke();
+
+    ctx.font = "700 24px sans-serif";
+    ctx.fillStyle = colors.accentDeep;
+    ctx.textAlign = "left";
+    ctx.fillText("মোট", colX[0] + 14, y + totalsRowH / 2 + 8);
+
+    var totalsByColIndex = { 2: totalProduction, 3: totalDelivery, 4: totalClosing };
+    [2, 3, 4].forEach(function (i) {
+      ctx.textAlign = "right";
+      ctx.font = "700 24px monospace";
+      var tx = colX[i] + contentW * cols[i].w - 14;
+      ctx.fillText(fmtNum(totalsByColIndex[i]), tx, y + totalsRowH / 2 + 8);
+    });
+
+    y += totalsRowH + sectionGap;
+
+    // ---- Production summary ----
+    drawSubhead("প্রোডাকশন সামারি");
+
+    var yieldBoxH = 285;
+    ctx.fillStyle = colors.accentSoft;
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(pad, y, contentW, yieldBoxH, 14);
+    } else {
+      ctx.rect(pad, y, contentW, yieldBoxH);
+    }
+    ctx.fill();
+
+    var yItems = [
+      { label: "মোট লাইভ মুরগি", value: fmtNum(record.totals.liveWeight) + " Kg" },
+      { label: "মোট প্রোডাকশন", value: fmtNum(record.totals.totalProduction) + " Kg" },
+      { label: "বিক্রয়যোগ্য মাংস", value: fmtNum(record.totals.totalSaleableMeat) + " Kg" },
+      { label: "বাই-প্রোডাক্ট", value: fmtNum(record.totals.totalByProduct) + " Kg" },
+      { label: "ফাইনাল স্টক", value: fmtNum(record.totals.totalClosing) + " Kg" },
+      { label: "ওয়েস্টেজ", value: fmtNum(record.totals.wastage) + " Kg" },
+      { label: "বিক্রয়যোগ্য মাংস %", value: fmtPct(record.totals.meatYieldPct) },
+      { label: "বাই-প্রোডাক্ট %", value: fmtPct(record.totals.byProductPct) },
+      { label: "ওয়েস্টেজ %", value: fmtPct(record.totals.wastagePct) }
+    ];
+
+    var yCols = 3;
+    var yColW = contentW / yCols;
+    var yRowH = 95;
+    yItems.forEach(function (item, i) {
+      var col = i % yCols;
+      var rowN = Math.floor(i / yCols);
+      var ix = pad + 24 + col * yColW;
+      var iy = y + 34 + rowN * yRowH;
+      ctx.textAlign = "left";
+      ctx.font = "500 19px sans-serif";
+      ctx.fillStyle = colors.inkFaint;
+      ctx.fillText(item.label, ix, iy);
+      ctx.font = "700 27px monospace";
+      ctx.fillStyle = colors.ink;
+      ctx.fillText(item.value, ix, iy + 34);
+    });
+
+    y += yieldBoxH + sectionGap;
+
+    // ---- Note ----
+    if (noteLines.length) {
+      ctx.font = "700 23px sans-serif";
+      ctx.fillStyle = colors.accentDeep;
+      ctx.textAlign = "left";
+      ctx.fillText("মন্তব্য:", pad, y + 26);
+      y += 44;
+      ctx.font = "500 25px sans-serif";
+      ctx.fillStyle = colors.ink;
+      noteLines.forEach(function (line) {
+        ctx.fillText(line, pad, y);
+        y += 34;
+      });
+      y += 8;
+    }
+
+    // ---- Footer ----
+    ctx.strokeStyle = colors.border;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(pad, H - footerH + 8);
+    ctx.lineTo(W - pad, H - footerH + 8);
+    ctx.stroke();
+
+    ctx.font = "500 20px sans-serif";
+    ctx.fillStyle = colors.inkFaint;
+    ctx.textAlign = "center";
+    ctx.fillText("Murgi.net  \u00B7  সংস্করণ 1.1  \u00B7  সর্বশেষ আপডেট: 17 Jul 2026", W / 2, H - footerH + 50);
+
+    return canvas;
+  }
+
+  /* =========================================================
+     SHARE / DOWNLOAD
+  ========================================================= */
+
+  function canvasToBlobPromise(canvas) {
+    return new Promise(function (resolve) {
+      canvas.toBlob(function (blob) { resolve(blob); }, "image/png", 0.95);
+    });
+  }
+
+  function downloadBlob(blob, fileName) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  function shareBlob(blob, fileName) {
+    var file;
+    try {
+      file = new File([blob], fileName, { type: "image/png" });
+    } catch (e) {
+      downloadBlob(blob, fileName);
+      return;
+    }
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: "দৈনিক প্রোডাকশন রিপোর্ট" }).catch(function () {});
+    } else {
+      downloadBlob(blob, fileName);
+      showToast("শেয়ার সাপোর্ট নেই, ডাউনলোড হয়েছে");
+    }
+  }
+
+  function dataUrlToBlob(dataUrl) {
+    return fetch(dataUrl).then(function (res) { return res.blob(); });
+  }
+
+  /* =========================================================
+     HISTORY SCREEN
+  ========================================================= */
+
+  function renderHistoryList() {
+    var history = loadHistory();
+    var container = document.getElementById("historyListContainer");
+    var clearBtn = document.getElementById("clearAllHistoryBtn");
+    container.innerHTML = "";
+
+    if (!history.length) {
+      var empty = document.createElement("p");
+      empty.className = "history-empty";
+      empty.textContent = "এখনো কোনো রিপোর্ট সংরক্ষিত হয়নি।";
+      container.appendChild(empty);
+      clearBtn.disabled = true;
+      return;
+    }
+    clearBtn.disabled = false;
+
+    history.forEach(function (record) {
+      var card = document.createElement("div");
+      card.className = "history-card";
+
+      var top = document.createElement("div");
+      top.className = "history-card-top";
+      var dateEl = document.createElement("span");
+      dateEl.className = "history-card-date";
+      dateEl.textContent = record.dateStr + " \u00B7 " + record.timeStr;
+      top.appendChild(dateEl);
+      card.appendChild(top);
+
+      var figures = document.createElement("div");
+      figures.className = "history-card-figures";
+      figures.innerHTML =
+        "<span>বিক্রয়যোগ্য মাংস %: <b>" + fmtPct(record.totals.meatYieldPct) + "</b></span>" +
+        "<span>ওয়েস্টেজ %: <b>" + fmtPct(record.totals.wastagePct) + "</b></span>";
+      card.appendChild(figures);
+
+      var actions = document.createElement("div");
+      actions.className = "history-card-actions";
+
+      var viewBtn = document.createElement("button");
+      viewBtn.type = "button";
+      viewBtn.className = "btn btn-outline btn-small";
+      viewBtn.textContent = "দেখুন";
+      viewBtn.addEventListener("click", function () { openHistoryViewer(record); });
+
+      var delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "btn btn-danger-ghost btn-small";
+      delBtn.textContent = "মুছুন";
+      delBtn.addEventListener("click", function () {
+        showConfirm("এই রিপোর্টটি মুছে ফেলবেন?", "এই রিপোর্টটি স্থায়ীভাবে মুছে যাবে।", function () {
+          var updated = loadHistory().filter(function (r) { return r.id !== record.id; });
+          saveHistory(updated);
+          renderHistoryList();
+          showToast("রিপোর্ট মুছে ফেলা হয়েছে");
+        });
+      });
+
+      actions.appendChild(viewBtn);
+      actions.appendChild(delBtn);
+      card.appendChild(actions);
+
+      container.appendChild(card);
+    });
+  }
+
+  function openHistoryViewer(record) {
+    currentHistoryViewerRecord = record;
+    document.getElementById("historyViewerTitle").textContent = record.dateStr;
+    document.getElementById("historyViewerImg").src = record.pngDataUrl;
+    showScreen("history-viewer");
+  }
+
+  /* =========================================================
+     SETTINGS SCREEN
+  ========================================================= */
+
+  function renderSettings() {
+    renderThemeToggle();
+    renderProductManageList();
+    renderPreparerManageList();
+  }
+
+  function renderPreparerManageList() {
+    var names = loadPreparers();
+    var container = document.getElementById("preparerManageList");
+    container.innerHTML = "";
+    names.forEach(function (name, idx) {
+      var row = document.createElement("div");
+      row.className = "product-row";
+      var top = document.createElement("div");
+      top.className = "product-row-top";
+      var nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.className = "product-name-input";
+      nameInput.value = name;
+      nameInput.setAttribute("aria-label", "প্রস্তুতকারীর নাম");
+      nameInput.addEventListener("input", function (e) {
+        names[idx] = e.target.value;
+        savePreparers(names);
+      });
+      var delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "product-delete-btn";
+      delBtn.innerHTML = "&times;";
+      delBtn.setAttribute("aria-label", "নামটি মুছুন");
+      delBtn.addEventListener("click", function () {
+        showConfirm("এই নামটি মুছে ফেলবেন?", "তালিকা থেকে এই নামটি সরিয়ে ফেলা হবে।", function () {
+          var updated = loadPreparers().filter(function (n, i) { return i !== idx; });
+          savePreparers(updated);
+          renderPreparerManageList();
+        });
+      });
+      top.appendChild(nameInput);
+      top.appendChild(delBtn);
+      row.appendChild(top);
+      container.appendChild(row);
+    });
+  }
+
+  function renderProductManageList() {
+    var products = loadProducts();
+    var lastClosing = loadLastClosing();
+    var container = document.getElementById("productManageList");
+    container.innerHTML = "";
+
+    products.forEach(function (product, idx) {
+      var hasBalance = parseNum(lastClosing[product.id]) !== 0;
+
+      var row = document.createElement("div");
+      row.className = "product-row";
+      if (product.isHidden) row.style.opacity = "0.55";
+
+      var top = document.createElement("div");
+      top.className = "product-row-top";
+
+      var reorder = document.createElement("div");
+      reorder.className = "product-reorder";
+      var upBtn = document.createElement("button");
+      upBtn.type = "button";
+      upBtn.textContent = "\u25B2";
+      upBtn.disabled = idx === 0;
+      upBtn.setAttribute("aria-label", "উপরে সরান");
+      upBtn.addEventListener("click", function () { moveProduct(idx, -1); });
+      var downBtn = document.createElement("button");
+      downBtn.type = "button";
+      downBtn.textContent = "\u25BC";
+      downBtn.disabled = idx === products.length - 1;
+      downBtn.setAttribute("aria-label", "নিচে সরান");
+      downBtn.addEventListener("click", function () { moveProduct(idx, 1); });
+      reorder.appendChild(upBtn);
+      reorder.appendChild(downBtn);
+
+      var nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.className = "product-name-input";
+      nameInput.placeholder = "পণ্যের নাম";
+      nameInput.value = product.name;
+      nameInput.setAttribute("aria-label", "পণ্যের নাম");
+      nameInput.addEventListener("input", function (e) {
+        product.name = e.target.value;
+        saveProducts(products);
+      });
+
+      var delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "product-delete-btn";
+      delBtn.innerHTML = "&times;";
+      delBtn.setAttribute("aria-label", "পণ্যটি মুছুন");
+      delBtn.addEventListener("click", function () {
+        if (hasBalance) {
+          showToast("এই পণ্যের ব্যালেন্স আছে, তাই এটি মুছে ফেলা যাবে না");
+          return;
+        }
+        showConfirm("এই পণ্যটি মুছে ফেলবেন?", "তালিকা থেকে এই পণ্যটি সরিয়ে ফেলা হবে।", function () {
+          var updated = loadProducts().filter(function (p) { return p.id !== product.id; });
+          saveProducts(updated);
+          renderProductManageList();
+        });
+      });
+
+      top.appendChild(reorder);
+      top.appendChild(nameInput);
+      top.appendChild(delBtn);
+      row.appendChild(top);
+
+      var bottom = document.createElement("div");
+      bottom.className = "product-row-bottom";
+
+      var unitInput = document.createElement("input");
+      unitInput.type = "text";
+      unitInput.className = "product-unit-input";
+      unitInput.placeholder = "একক";
+      unitInput.value = product.unit;
+      unitInput.setAttribute("aria-label", "একক");
+      unitInput.addEventListener("input", function (e) {
+        product.unit = e.target.value;
+        saveProducts(products);
+      });
+
+      var byProductLabel = document.createElement("label");
+      byProductLabel.className = "by-product-check-label";
+      var byProductCheckbox = document.createElement("input");
+      byProductCheckbox.type = "checkbox";
+      byProductCheckbox.checked = !!product.isByProduct;
+      byProductCheckbox.addEventListener("change", function (e) {
+        product.isByProduct = e.target.checked;
+        saveProducts(products);
+      });
+      byProductLabel.appendChild(byProductCheckbox);
+      byProductLabel.appendChild(document.createTextNode("বাই-প্রোডাক্ট"));
+
+      var hideBtn = document.createElement("button");
+      hideBtn.type = "button";
+      hideBtn.className = "btn btn-ghost btn-small";
+      hideBtn.textContent = product.isHidden ? "দেখান" : "লুকান";
+      hideBtn.addEventListener("click", function () {
+        if (!product.isHidden && hasBalance) {
+          showToast("এই পণ্যের ব্যালেন্স আছে, তাই এটি লুকানো যাবে না");
+          return;
+        }
+        product.isHidden = !product.isHidden;
+        saveProducts(products);
+        renderProductManageList();
+      });
+
+      bottom.appendChild(unitInput);
+      bottom.appendChild(byProductLabel);
+      bottom.appendChild(hideBtn);
+      if (product.isHidden) {
+        var hiddenTag = document.createElement("span");
+        hiddenTag.className = "byproduct-tag";
+        hiddenTag.textContent = "লুকানো";
+        bottom.appendChild(hiddenTag);
+      }
+      row.appendChild(bottom);
+
+      container.appendChild(row);
+    });
+  }
+
+  function moveProduct(idx, direction) {
+    var products = loadProducts();
+    var newIdx = idx + direction;
+    if (newIdx < 0 || newIdx >= products.length) return;
+    var tmp = products[idx];
+    products[idx] = products[newIdx];
+    products[newIdx] = tmp;
+    saveProducts(products);
+    renderProductManageList();
+  }
+
+  function addNewProduct() {
+    var products = loadProducts();
+    products.push({ id: uid(), name: "", unit: "Kg", isByProduct: false, isHidden: false });
+    saveProducts(products);
+    renderProductManageList();
+  }
+
+  /* =========================================================
+     INIT & EVENT WIRING
+  ========================================================= */
+
+  document.addEventListener("DOMContentLoaded", function () {
+    applyTheme();
+    loadProducts();
+    renderHome();
+
+    document.getElementById("homeHistoryLink").addEventListener("click", function () {
+      renderHistoryList();
+      showScreen("history");
+    });
+    document.getElementById("homeSettingsLink").addEventListener("click", function () {
+      renderSettings();
+      showScreen("settings");
+    });
+
+    document.getElementById("dataEntryHomeBtn").addEventListener("click", function () {
+      showScreen("home");
+      renderHome();
+    });
+    document.getElementById("addReceiveEntryBtn").addEventListener("click", addReceiveEntry);
+    document.getElementById("goToReviewBtn").addEventListener("click", goToReview);
+
+    document.getElementById("editDateBtn").addEventListener("click", function () {
+      showConfirm(
+        "তারিখ পরিবর্তন",
+        "আপনি কি রিপোর্টের তারিখ পরিবর্তন করতে চান?",
+        function () {
+          var input = document.getElementById("dateEditModalInput");
+          input.value = currentDraft.isoDate || isoDateSlug(new Date());
+          document.getElementById("dateEditModal").hidden = false;
+        },
+        { confirmLabel: "হ্যাঁ", cancelLabel: "না" }
+      );
+    });
+    document.getElementById("dateEditModalCancel").addEventListener("click", function () {
+      document.getElementById("dateEditModal").hidden = true;
+    });
+    document.getElementById("dateEditModalConfirm").addEventListener("click", function () {
+      var val = document.getElementById("dateEditModalInput").value;
+      if (!val) {
+        document.getElementById("dateEditModal").hidden = true;
+        return;
+      }
+      var parts = val.split("-");
+      var picked = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      currentDraft.dateStr = formatBanglaDate(picked);
+      currentDraft.isoDate = isoDateSlug(picked);
+      saveDraft(currentDraft);
+      document.getElementById("dataEntryDateDisplay").textContent = currentDraft.dateStr;
+      document.getElementById("dateEditModal").hidden = true;
+      showToast("তারিখ পরিবর্তন করা হয়েছে");
+    });
+
+    document.getElementById("reviewBackBtn").addEventListener("click", function () {
+      currentDraft.note = document.getElementById("reviewNoteInput").value.trim();
+      saveDraft(currentDraft);
+      showScreen("data-entry");
+      renderDataEntryScreen();
+    });
+    document.getElementById("reviewEditBtn").addEventListener("click", function () {
+      currentDraft.note = document.getElementById("reviewNoteInput").value.trim();
+      saveDraft(currentDraft);
+      showScreen("data-entry");
+      renderDataEntryScreen();
+    });
+    document.getElementById("reviewGenerateBtn").addEventListener("click", finalizeReport);
+
+    document.getElementById("backFromGeneratedBtn").addEventListener("click", function () {
+      if (!currentDraft) currentDraft = loadDraft();
+      if (!currentDraft) {
+        showScreen("home");
+        renderHome();
+        return;
+      }
+      renderReviewScreen();
+      showScreen("review");
+    });
+    document.getElementById("shareReportBtn").addEventListener("click", function () {
+      if (!lastGeneratedCanvas) return;
+      canvasToBlobPromise(lastGeneratedCanvas).then(function (blob) {
+        if (blob) shareBlob(blob, lastGeneratedFileName);
+      });
+    });
+    document.getElementById("downloadReportBtn").addEventListener("click", function () {
+      if (!lastGeneratedCanvas) return;
+      canvasToBlobPromise(lastGeneratedCanvas).then(function (blob) {
+        if (blob) downloadBlob(blob, lastGeneratedFileName);
+      });
+    });
+    document.getElementById("startNewFromGeneratedBtn").addEventListener("click", function () {
+      clearDraft();
+      showScreen("home");
+      renderHome();
+    });
+
+    document.getElementById("historyBackBtn").addEventListener("click", function () {
+      showScreen("home");
+      renderHome();
+    });
+    document.getElementById("clearAllHistoryBtn").addEventListener("click", function () {
+      showConfirm("সব রিপোর্ট মুছে ফেলবেন?", "সংরক্ষিত সবগুলো রিপোর্ট স্থায়ীভাবে মুছে যাবে।", function () {
+        saveHistory([]);
+        renderHistoryList();
+        showToast("সব রিপোর্ট মুছে ফেলা হয়েছে");
+      });
+    });
+
+    document.getElementById("historyViewerBackBtn").addEventListener("click", function () {
+      renderHistoryList();
+      showScreen("history");
+    });
+    document.getElementById("historyViewerShareBtn").addEventListener("click", function () {
+      if (!currentHistoryViewerRecord) return;
+      dataUrlToBlob(currentHistoryViewerRecord.pngDataUrl).then(function (blob) {
+        shareBlob(blob, "daily-production-report.png");
+      });
+    });
+    document.getElementById("historyViewerDownloadBtn").addEventListener("click", function () {
+      if (!currentHistoryViewerRecord) return;
+      dataUrlToBlob(currentHistoryViewerRecord.pngDataUrl).then(function (blob) {
+        downloadBlob(blob, "daily-production-report.png");
+      });
+    });
+
+    document.getElementById("settingsBackBtn").addEventListener("click", function () {
+      showScreen("home");
+      renderHome();
+    });
+    document.getElementById("themeToggleGroup").addEventListener("click", function (e) {
+      var btn = e.target.closest(".theme-toggle-btn");
+      if (btn) setTheme(btn.getAttribute("data-theme-choice"));
+    });
+    document.getElementById("addProductBtn").addEventListener("click", addNewProduct);
+    document.getElementById("addPreparerBtn").addEventListener("click", function () {
+      var names = loadPreparers();
+      names.push("নতুন নাম");
+      savePreparers(names);
+      renderPreparerManageList();
+    });
+
+    document.getElementById("confirmModalCancel").addEventListener("click", function () {
+      document.getElementById("confirmModal").hidden = true;
+      var cancelCb = confirmCancelCallback;
+      confirmCallback = null;
+      confirmCancelCallback = null;
+      if (cancelCb) cancelCb();
+    });
+    document.getElementById("confirmModalConfirm").addEventListener("click", function () {
+      document.getElementById("confirmModal").hidden = true;
+      var cb = confirmCallback;
+      confirmCallback = null;
+      confirmCancelCallback = null;
+      if (cb) cb();
+    });
+
+    function submitPreparerModal() {
+      var select = document.getElementById("preparerModalSelect");
+      var name = select.value;
+      if (!name) {
+        showToast("প্রস্তুতকারীর নাম আবশ্যক");
+        return;
+      }
+      document.getElementById("preparerModal").hidden = true;
+      var cb = preparerModalCallback;
+      preparerModalCallback = null;
+      if (cb) cb(name);
+    }
+    document.getElementById("preparerModalConfirm").addEventListener("click", submitPreparerModal);
+    document.getElementById("preparerModalCancel").addEventListener("click", function () {
+      document.getElementById("preparerModal").hidden = true;
+      preparerModalCallback = null;
+    });
+  });
+})();
+</script>
+</body>
+</html>
